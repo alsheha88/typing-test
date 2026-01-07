@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/favicon-32x32.png">
+
+  <title>Frontend Mentor | Typing Speed Test</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@100..800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="wrapper">
+    <header>
+      <div class="logo-lg">
+        <img src="./assets/images/logo-large.svg" alt="logo">
+      </div>
+      <div class="logo-sm">
+        <img src="./assets/images/logo-small.svg" alt="logo">
+      </div>
+      <div class="personal-best" id="personal-best">
+        <img src="./assets/images/icon-personal-best.svg" alt="trophy">
+        <span >Personal best:</span>
+        <p class="personal-record" id="personal-best-display">92 WPM</p>
+      </div>
+    </header>
+    <main>
+      <section class="stats-difficulty-modes">
+        <div class="stats">
+          <div class="progress-box">
+            <span>WPM:</span>
+            <p id="WPM">0</p>
+          </div>
+          <div class="progress-box">
+            <span>Accuracy:</span>
+            <p id="accuracy">0%</p>
+          </div>
+          <div class="progress-box">
+            <span>Time:</span>
+            <p id="timer">0:00</p>
+          </div>
+        </div>
+        <div class="difficulty-mode">
+          <span>Difficulty: </span>
+          <div class="difficulty">
+            <div class="difficulty-options">
+              <button id="easy-btn" class="difficulty-btn">Easy</button>
+              <button id="medium-btn" class="difficulty-btn">Medium</button>
+              <button id="hard-btn" class="difficulty-btn">Hard</button>
+            </div>
+          </div>
+          <div class="mode">
+            <span>Mode: </span>
+            <div class="mode-options">
+              <button id="timer-btn" class="timer-mode">Timed (60s)</button>
+              <button id="passage-btn" class="timer-mode">Passage</button>
+            </div>
+          </div>
+        </div>
+        <!-- Add Drop Down -->
+        <div class="dropdowns">
+          <div class="dropdown-box">
+            <button class="dropdown-btn" id="difficulty-dropdown">Hard <img src="./assets/images/icon-down-arrow.svg" alt=""></button>
+            <ul id="difficulty-ul">
+              <li id="easy" class="difficulty-btn"><div class="outer-circle"><div class="inner-circle"></div></div>Easy</li>
+              <li id="medium" class="difficulty-btn"><div class="outer-circle"><div class="inner-circle"></div></div>Medium</li>
+              <li id="hard" class="difficulty-btn"><div class="outer-circle"><div class="inner-circle"></div></div>Hard</li>
+            </ul>
+          </div>
+          <div class="dropdown-box">
+            <button class="dropdown-btn" id="mode-dropdown">Timed (60s) <img src="./assets/images/icon-down-arrow.svg" alt="">
+            </button>
+            <ul id="mode-ul">
+              <li id="timed-mode" class="modes timer-mode">
+                <div class="outer-circle">
+                  <div class="inner-circle"></div>
+                </div>Timed
+              </li>
+              <li id="passage-mode" class="modes timer-mode">
+                <div class="outer-circle">
+                  <div class="inner-circle"></div>
+                </div>Passage
+              </li>
+            </ul>
+            </div>
+
+        </div>
+      </section>
+      <section class="passage" >
+        <div class="passage-display-box">
+          <div class="passage-not-started">
+              <button id="start-test">Start Typing Test</button>
+              <p>Or click the text and start typing</p>
+            </div>
+          <div id="passage-display">
+            
+          </div>
+          
+          <button id="restart-test">Restart Test <img src="./assets/images/icon-restart.svg" alt=""></button>
+        </div>
+      </section>
+    </main>
+    <section id="baseline" class="test-page">
+      <div class="star-2">
+        <img src="./assets/images/pattern-star-2.svg" alt="">
+      </div>
+      <div class="results-page">
+        <div class="outer-bg">
+          <div class="inner-bg">
+            <img src="./assets/images/icon-completed.svg" alt="">
+          </div>
+        </div>
+        <h1>Baseline Established</h1>
+        <span>You1ve set the bar. Now the real challenge begins-time to beat it</span>
+        <div class="results">
+          <div class="results-box">
+            <span>WPM:</span>
+            <p id="WPM-results" class="WPM-results-baseline">85</p>
+          </div>
+          <div class="results-box">
+            <span>Accuracy:</span>
+            <p id="accuracy-results" class="accuracy-results-baseline">90%</p>
+          </div>
+          <div class="results-box">
+            <span>Characters:</span>
+            <div class="char-typed"><span class="typed-correct baseline-correct">0</span>/<span class="typed-mistake baseline-mistake">0</span></div>
+          </div>
+        </div>
+        <button id="beat-score-btn1" class="results-button">Beat This Score <img src="./assets/images/icon-restart.svg"
+            alt="" class="restart-img"></button>
+      </div>
+      <div class="star-1"><img src="./assets/images/pattern-star-1.svg" alt=""></div>
+    </section>
+    <section id="new-pb" class="test-page">
+      <div class="results-page">
+        <div class="pb-img">
+          <img src="./assets/images/icon-new-pb.svg" alt="">
+        </div>
+        <h1>High Score Smashed!</h1>
+        <span>You're getting faster. That was incredible typing</span>
+        <div class="results">
+          <div class="results-box">
+            <span>WPM:</span>
+            <p id="WPM-results" class="WPM-results-pb">85</p>
+          </div>
+          <div class="results-box">
+            <span>Accuracy:</span>
+            <p id="accuracy-results" class="accuracy-results-pb">90%</p>
+          </div>
+          <div class="results-box">
+            <span>Characters:</span>
+            <div class="char-typed"><span class="typed-correct pb-correct">0</span>/<span class="typed-mistake pb-mistake">0</span></div>
+          </div>
+        </div>
+        <button id="beat-score-btn2" class="results-button">Beat This Score <img src="./assets/images/icon-restart.svg"
+            alt="" class="restart-img"></button>
+      </div>
+      <div class="confetti"><img src="./assets/images/pattern-confetti.svg" alt=""></div>
+    </section>
+    <section id="test-complete" class="test-page">
+      <div class="star-2"><img src="./assets/images/pattern-star-2.svg" alt=""></div>
+      <div class="results-page">
+        <div class="outer-bg">
+          <div class="inner-bg">
+            <img src="./assets/images/icon-completed.svg" alt="">
+          </div>
+        </div>
+        <h1>Test Complete!</h1>
+        <span>You're getting faster. That was incredible typing</span>
+        <div class="results">
+          <div class="results-box">
+            <span>WPM:</span>
+            <p id="WPM-results" class="WPM-results-complete">85</p>
+          </div>
+          <div class="results-box">
+            <span>Accuracy:</span>
+            <p id="accuracy-results" class="accuracy-results-complete">90%</p>
+          </div>
+          <div class="results-box">
+            <span>Characters:</span>
+            <div class="char-typed"><span class="typed-correct complete-correct">0</span>/<span class="typed-mistake complete-mistake">0</span></div>
+          </div>
+        </div>
+        <button id="go-again-btn" class="results-button">Go Again <img src="./assets/images/icon-restart.svg"
+            alt="" class="restart-img"></button>
+      </div>
+      <div class="star-1"><img src="./assets/images/pattern-star-1.svg" alt=""></div>
+    </section>
+  </div>
+</body>
+<!-- <script src="./script.js"></script> -->
+ <script src="./index.js" defer></script>
+ <!-- <script src="./typtingTest.js"></script> -->
+
+</html>
