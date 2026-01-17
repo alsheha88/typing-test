@@ -56,7 +56,11 @@ const domState = {
         this.modes.forEach((mode) => {
             mode.classList.remove('active');
             mode.disabled = false;
-        })
+        });
+        document.getElementById('difficulty-dropdown').classList.remove('active')
+        document.getElementById('mode-dropdown').classList.remove('active')
+        this.modeDropdown.classList.remove('show')
+        this.difficultyDropdown.classList.remove('show')
     }
 }
 const state = {
@@ -64,45 +68,47 @@ const state = {
     passageLetters: [],
     testStartTime: null,
     intervalId: null,
-    value: 0,
     difficulty: null,
     startTest: false,
     errors: 0,
     netWPM: 0,
     accuracy: 0,
     mode: null,
+    seconds: 0,
 }
 function resetState(){
     state.cursorPosition = 0;
     state.passageLetters = [];
     state.testStartTime = null;
-    state.value = 0;
     state.difficulty = null;
     state.startTest = false;
     state.errors = 0;
     state.netWPM = 0;
     state.accuracy = 0;
     state.mode = null;
+    state.seconds = 0;
+    stopCurrentTimer()
 }
 function logState(){
     // console.table(state);
 }
 
-domState.PBDisplay.textContent = `${parseInt(localStorage.getItem('personalBest') || '0')} WPM`
+renderPersonalBest()
 
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelector('.passage-not-started').style.display = 'flex';
 
 })
 document.querySelector('#restart-test').style.display = 'none'
+document.querySelector('#restart-test').addEventListener('click', resetAll)
 
 document.querySelectorAll('li').forEach((item) => {
     item.addEventListener('click', selectCat)
 })
 document.querySelector('#difficulty-dropdown').addEventListener('click', toggleDropdown)
 document.querySelector('#mode-dropdown').addEventListener('click', toggleDropdown)
-document.querySelector('#start-test').addEventListener('click', startTest2)
-document.querySelector('.passage-not-started').addEventListener('click', startTest2)
+document.querySelector('#start-test').addEventListener('click', startTest)
+document.querySelector('.passage-not-started').addEventListener('click', startTest)
 document.querySelectorAll('.timer-mode').forEach((mode) => {
     mode.addEventListener('click', setMode)
 })
@@ -125,7 +131,6 @@ function resetAll(){
 
 function toggleDropdown(e){
     if (e.target.id === 'difficulty-dropdown'){
-
         domState.difficultyDropdown.classList.toggle('show');
     } else if (e.target.id === 'mode-dropdown'){
         domState.modeDropdown.classList.toggle('show')
@@ -137,7 +142,7 @@ function selectCat(e){
     document.querySelectorAll('li').forEach((item) => {
         if (item.id === clickedBtn.id){
             item.querySelector('.outer-circle').classList.add('selected');
-            item.parentElement.style.opacity = '0';
+            item.parentElement.classList.remove('show')
             item.parentElement.previousElementSibling.innerHTML = `${item.textContent} <img src="./assets/images/icon-down-arrow.svg" alt="">`
             item.parentElement.previousElementSibling.classList.add('active')
             item.querySelector('.outer-circle').classList.remove('selected')
@@ -178,16 +183,19 @@ function displayRandomPassage(e){
         renderPassage(state.passageRes.easyPassage[randomPassageIndex]);
         document.querySelector('#medium-btn').disabled = true
         document.querySelector('#hard-btn').disabled = true
+        domState.difficultyDropdown.classList.remove('show')
     } else if (e.target.id === 'medium-btn' || e.target.id === 'medium') {
         state.difficulty = 'medium';
         renderPassage(state.passageRes.mediumPassage[randomPassageIndex])
         document.querySelector('#easy-btn').disabled = true
         document.querySelector('#hard-btn').disabled = true
+        domState.difficultyDropdown.classList.remove('show')
     } else if (e.target.id === 'hard-btn' || e.target.id === 'hard') {
         state.difficulty = 'hard'
         renderPassage(state.passageRes.hardPassage[randomPassageIndex])
         document.querySelector('#medium-btn').disabled = true
         document.querySelector('#easy-btn').disabled = true
+        domState.difficultyDropdown.classList.remove('show')
     }
 }
 
@@ -213,6 +221,7 @@ function typeCharacter(e){
         console.warn('Tried to type character when test wasn`t started')
         return
     }
+    
     if (e.key === 'Backspace'){
         state.passageLetters[state.cursorPosition].correct = undefined;
         state.cursorPosition--
@@ -224,36 +233,41 @@ function typeCharacter(e){
                 state.passageLetters[state.cursorPosition].span.classList.add("correct");
             } else {
                 state.passageLetters[state.cursorPosition].span.classList.add('mistake-correction');
+                state.passageLetters[state.cursorPosition].correct = undefined;
             }
-            console.log('correct', state.passageLetters[state.cursorPosition]);
         }  else {
             state.passageLetters[state.cursorPosition].correct = false;
             state.passageLetters[state.cursorPosition].mistake++
             state.passageLetters[state.cursorPosition].span.classList.add("mistake");
-            console.log('mistake', state.passageLetters[state.cursorPosition]);
         }
         state.cursorPosition++;
+        console.log(state.passageLetters)
+    }
+    // First remove cursor from all spans
+    state.passageLetters.forEach(({ span }) => span.classList.remove('cursor'));
+
+    // Then add cursor to current position
+    if (state.passageLetters[state.cursorPosition]) {
+        state.passageLetters[state.cursorPosition].span.classList.add('cursor');
     }
     wPMAccuracyCalc();
-    logState();
+    // logState();
 }
 
 function elapsedTime(){
-    if (state.testStartTime === null) {
-        state.testStartTime = Date.now();
-    }
     const elapsedMs = Date.now() - state.testStartTime;
     const minutes = (elapsedMs / 60000);
     
     return minutes
 }
 function wPMAccuracyCalc(){
-    // const totalCount = state.cursorPosition;
     let totalCount;
     for (let i = 0; i < state.passageLetters.length; i++) {
         if (state.passageLetters[i].correct === undefined && state.passageLetters[i].mistake === 0) {
             totalCount = i;
             break;
+        } else {
+            totalCount = state.passageLetters.length;
         }
     }
     const correctCount = state.passageLetters.reduce((acc, cur) => {
@@ -262,46 +276,26 @@ function wPMAccuracyCalc(){
     const errorsCount = state.passageLetters.reduce((acc, cur) => {
         return acc + cur.mistake;
     },0);
-    console.log(totalCount, correctCount, errorsCount);
     const grossWPM = totalCount/ 5;
     state.netWPM = Math.round((grossWPM - errorsCount) / elapsedTime());
-    state.accuracy = ((correctCount/ totalCount) * 100).toFixed(1);
+    state.accuracy = ((correctCount / totalCount) * 100).toFixed(1);
     
     displayStats()
 }
 function displayStats(){
-    if (state.netWPM < 0 || state.netWPM === Infinity){
-        state.netWPM = '--'
-    }
+    // if (state.netWPM < 0 || state.netWPM === Infinity){
+    //     state.netWPM = '--'
+    // }
     document.querySelector('#WPM').innerText = state.netWPM;
     document.querySelector("#accuracy").innerText = `${state.accuracy}%`;
     document.querySelector("#accuracy").style.color = `var(--Red-500)`;
+    
 }
 
-function modeTimer(mode){
-    if (mode !== 'timer' && mode !== 'passage') throw new Error('Mode must be Timer or Passage')
+function modeTimer(){
+    if (state.mode !== 'timer' && state.mode !== 'passage') throw new Error('Mode must be Timer or Passage')
     stopCurrentTimer()
-    if (mode === 'timer'){
-        state.value = 60;
-    } else {
-        state.value = 0;
-    }
-    renderTimer()
-    state.intervalId = setInterval(() => {
-        if (mode === "timer") {
-            state.value--;
-            renderTimer();
-            if (state.value <= 0 || state.cursorPosition === state.passageLetters.length) {
-                testComplete();
-            }
-        } else {
-            state.value++;
-            renderTimer();
-            if (state.cursorPosition === state.passageLetters.length) {
-                testComplete();
-            }
-        }
-    }, 1000);  
+    state.intervalId = setInterval(evaluateTimer, 50);
 }
 function stopCurrentTimer() {
     if (state.intervalId !== null) {
@@ -309,12 +303,24 @@ function stopCurrentTimer() {
         state.intervalId = null;
     }
 }
-
-function renderTimer(){
-    domState.timer.textContent = `0:${state.value}`;
-    if (state.value < 10){
-        domState.timer.textContent = `0:0${state.value}`;
+function evaluateTimer(){
+    let timerValue = Date.now() - state.testStartTime;
+    console.log('Timer mode: ',state.mode)
+    if (state.mode === 'timer'){
+        timerValue = 60000 - timerValue;
     }
+    timerValue = Math.floor(timerValue / 1000);
+    renderTimer(timerValue);
+    console.log(timerValue);
+    if (state.cursorPosition === state.passageLetters.length || (state.mode === "timer" && timerValue <= 0)) {
+        console.log('Test Complete')
+        testComplete();
+    }
+}
+function renderTimer(timerValue){
+    const minutes = Math.floor(timerValue / 60);
+    const seconds = timerValue % 60;
+    domState.timer.textContent = `${minutes}:${seconds < 10 ? `0` : ''}${seconds}`;
     domState.timer.style.color = `var(--Yellow-400)`;
 }
 function testComplete(){
@@ -322,10 +328,15 @@ function testComplete(){
     state.startTest = false;
     const currentWPM = state.netWPM;
     const currentAccuracy = state.accuracy;
-    const correct = 0;
-    const mistakes = 0;
+    const correct = state.passageLetters.reduce((acc, cur) => {
+        return cur.correct ? ++acc : acc;
+    },0);
+    const mistakes = state.passageLetters.reduce((acc, cur) => {
+        return acc + cur.mistake;
+    },0);
     
-    const personalBest = parseInt(localStorage.getItem('personalBest') || '0');
+    let personalBest = localStorage.getItem('personalBest');
+    if (isNaN(Number(personalBest))) personalBest = 0;
     
     if (personalBest === 0){
         domState.main.style.display = 'none';
@@ -352,27 +363,36 @@ function testComplete(){
         domState.correctCharComplete.textContent = correct;
         domState.mistakeCharComplete.textContent = mistakes;
     }
+    renderPersonalBest()
 }
 
-function startTest2(){
-    console.log('starting test2');
+function startTest(){
+    console.log('starting test');
     state.startTest = true
+    state.testStartTime = Date.now();
+
     document.querySelector('.passage-not-started').style.display = 'none';
     document.querySelector('#restart-test').style.display = 'flex'
 
-    modeTimer(state.mode)
+    modeTimer()
 }
 
 function setMode(e){
     const clickedMode = e.target;
-    document.querySelectorAll('.timer-mode').forEach((btn) => {if (btn == clickedMode)  {btn.classList.add('active')} else {btn.classList.remove('active')}  })
+    document.querySelectorAll('.timer-mode').forEach((btn) => {if (btn == clickedMode)  {btn.classList.add('active')} else {btn.classList.remove('active')}})
     if (clickedMode.id == 'timer-btn' || clickedMode.id == 'timed-mode'){
         state.mode = 'timer'
         document.querySelector('#passage-btn').disabled = true;
-    } else if (clickedMode.id == 'passage-btn' || clickedBtn.id == 'passage-mode'){
+        domState.modeDropdown.classList.remove('show')
+    } else if (clickedMode.id == 'passage-btn' || clickedMode.id == 'passage-mode'){
         state.mode = 'passage'
         document.querySelector('#timer-btn').disabled = true;
+        domState.modeDropdown.classList.remove('show');
     }
+}
+
+function renderPersonalBest(){
+    domState.PBDisplay.textContent = `${parseInt(localStorage.getItem('personalBest') || '0')} WPM`
 }
 
 

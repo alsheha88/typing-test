@@ -22,7 +22,7 @@ Using this design file will help you practice building projects the same way pro
 
 ### Extracting values
 
-- **Colors:** Click on any color in the right panel to copy its value (HEX, RGB, or HSL)
+- **Colors:** Click on any color in the right panel to copy its timerValue (HEX, RGB, or HSL)
 - **Fonts:** Select text to see all typography details in the right sidebar under "Text"
 - **Dimensions:** Select any element to see its width, height, and position values
 

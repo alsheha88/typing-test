@@ -22,7 +22,7 @@ body{
     color: var(--Neutral-0);
     display: grid;
     margin: 0;
-    height: 100dvh;
+    min-height: 100dvh;
 }
 span{
     color: var(--Neutral-500)
@@ -131,15 +131,10 @@ main{
     justify-content: flex-start;
     align-items: center;
 }
-/* .difficulty button:focus, .mode button:focus{
-    color: var(--Blue-400);
-    border-color: var(--Blue-400);
-} */
+
 .passage{
     width: 100%;
     height: clamp(30rem, 35rem, 75rem);
-    /* min-height: 35rem;
-    max-height: 65rem; */
     position: relative;
     
 }
@@ -211,22 +206,26 @@ main{
     display: flex;
     justify-content: space-between;
     width: 100%;
-    height: 100%;
+    min-height: max-content;
     position: relative;
     margin-top: 2rem;
+    /* max-width: 95%; */
+    text-align: center;
 }
 
 .star-2{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    
 }
 .star-1{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    width: 74px;
+    height: 74px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
 }
 .results-page{
     display: flex;
@@ -234,7 +233,9 @@ main{
     align-items: center;
     gap: 2rem;
     width: 100%;
+    min-height: max-content;
 }
+
 .outer-bg{
     background-color: hsl(138deg 23% 13%);
     border-radius: 50%;
@@ -263,12 +264,12 @@ main{
     flex-direction: column;
     justify-content: flex-start;
     align-items: flex-start;
-    border: 1px solid var(--Neutral-0);
+    border: 1px solid var(--Neutral-800);
     border-radius: 0.5rem;
     padding: 0.5rem 1rem;
     max-width: 90%;
     width: 10rem;
-    height: 100%;
+    /* height: 100%; */
 }
 .results-button{
     padding: 1rem 1.5rem;
@@ -279,20 +280,35 @@ main{
     align-items: center;
     font-weight: 600;
     border-radius: 0.5rem;
-    margin-top: 2rem;
+    /* margin-top: 2rem; */
     background-color: var(--Neutral-0);
     cursor: pointer;
 }
 .confetti{
-    display: block;
-    min-width: 100%;
-    
+  display: block;
+  width: 100dvw;
+  height: 300px;
+  background-image: url("./assets/images/pattern-confetti.svg");
+  background-repeat: repeat;
+  background-size: auto;
+  animation: floatConfetti 5s linear infinite;
 }
-#baseline{display: none;}
+
+@keyframes floatConfetti {
+  0%   { background-position: 0 0; }
+  50%  { background-position: 0 -150px; }
+  100% { background-position: 0 0; }
+}
+
+#baseline{
+ display: none;   
+}
 #new-pb{
     display: none;
     flex-direction: column;
     align-items: center;
+    justify-content: space-between;
+    height: 100%;
 }
 .char-typed{
     display: flex;
@@ -418,6 +434,32 @@ li:hover{
     border-bottom: 2px solid var(--Red-500);
     color: var(--Green-500);
 }
+/* .cursor{
+    background-color: var(--Neutral-800);
+    animation: animateCursor 1s ease-in-out infinite;
+} */
+.cursor {
+    background-color: var(--Neutral-800);
+    position: relative;
+}
+
+.cursor::after {
+    content: '';
+    position: absolute;
+    right: -1px;
+    top: 0;
+    width: 2px;
+    height: 100%;
+    background-color: white;
+    animation: blinkCaret 1s step-end infinite;
+}
+
+@keyframes blinkCaret {
+    from, to { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+
 @media (max-width: 900px){
     .stats-difficulty-modes{
         display: flex;
@@ -425,6 +467,26 @@ li:hover{
         justify-content: center;
         align-items: flex-start;
         margin-bottom: 1rem;
+    }
+   
+    .results-box{
+        width: 100%;
+        
+    }
+    .results{
+        width: 100%;
+        justify-content: center;
+
+    }
+    .test-page{
+        height: 60%;
+    }
+    .star-1{
+        justify-content: space-between;
+
+    }
+    .star-2{
+        justify-content: flex-start;
     }
 }
 @media (max-width: 590px){
@@ -470,6 +532,35 @@ li:hover{
     .progress-box:nth-child(1)::after, .progress-box:nth-child(2)::after{
     transform: translateY(0);
     } 
+     .test-page{
+        height: 85%;       
+    }
+    .results-page{
+        gap: 1.5rem;
+    }
+    .results-page h1{
+        margin: 0;
+    }
+    .star-1{
+        width: 39px;
+        height: 39px;
+    }
+    .star-2{
+        width: 21px;
+        height: 21px;
+    }
+    .results{
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .confetti{
+        height: 200px;
+    }
+    .confetti img{
+        height: 100%;
+        
+    }
 }
 @media (max-width: 300px){
     .personal-best span{

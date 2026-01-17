@@ -74,7 +74,7 @@ A `data.json` file is provided with passages organized by difficulty. Each passa
 
 ### Data Persistence
 
-The personal best score should persist across browser sessions using `localStorage`. When a user beats their high score, the new value should be saved and displayed on subsequent visits.
+The personal best score should persist across browser sessions using `localStorage`. When a user beats their high score, the new timerValue should be saved and displayed on subsequent visits.
 
 ### Want some support on the challenge? 
 
