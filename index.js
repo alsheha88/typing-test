@@ -1,6 +1,17 @@
 'use strict';
 let domState;
 
+const uiState = {
+    completionScreenDisplayed: false,
+    completionType: undefined,
+    results: {
+        wpm: undefined,
+        accuracy: undefined,
+        correct: undefined,
+        mistakes: undefined,
+    },
+    personalBest: undefined,
+}
 const state = {
     cursorPosition: 0,
     passageLetters: [],
@@ -33,8 +44,7 @@ function logState(){
     // console.table(state);
 }
 
-initializeDOM();
-registerDOM();
+renderUI();
 
 (async () => {
     state.passageRes = await getPassage();
@@ -42,8 +52,7 @@ registerDOM();
 
 function resetAll(){
     resetState();
-    initializeDOM();
-    registerDOM();
+    renderUI();
 }
 
 function toggleDropdown(e){
@@ -249,26 +258,78 @@ function renderTimer(timerValue){
 function testComplete(){
     stopCurrentTimer()
     state.startTest = false;
-    
+    uiState.completionScreenDisplayed = true;
     if (state.netWPM > state.personalBest){
+        if (state.personalBest === 0){
+            uiState.completionType = 'baseline';
+        } else {
+            uiState.completionType = 'beaten';
+        }
         updatePersonalBest(state.netWPM);
+    } else {
+        uiState.completionType = 'testComplete';
     }
-    domState.main.style.display = 'none';
-    domState.testCompleteResults.style.display = 'flex';
-    domState.WPMResultsComplete.textContent = state.netWPM;
-    domState.accuracyResultsComplete.textContent = `${state.accuracy}%`
-    domState.correctCharComplete.textContent = correctCount();
-    domState.mistakeCharComplete.textContent = errorsCount();
-    domState.PBDisplay.textContent = `${state.personalBest} WPM`;
+    uiState.results.wpm = state.netWPM;
+    uiState.results.accuracy = state.accuracy
+    uiState.results.correct = correctCount();
+    uiState.results.mistakes = errorsCount();
+    renderUI();
 }
 
 function renderUI(){
-    // uiState.completionScreenDisplayed: boolean
-    // uiState.completionType: (baseline | beaten | testComplete)
-    // Note: pull code from gitHub for rendreing completion times.
+    let ui;
+    if (uiState.completionScreenDisplayed){
+        ui = cloneTemplate('completionScreen');
+        const inserts = {};
+        if (uiState.completionType === 'baseline'){
+            inserts.heading = 'Baseline Established';
+            inserts.completionScreenHeaderImg = cloneTemplate('completionScreenHeaderImg-baseline-testComplete');
+            inserts.subheading = 'You\'ve set the bar. Now the real challenge begins-time to beat it';
+            inserts.buttonText = 'Beat this score';
+
+        } else if (uiState.completionType === 'beaten'){
+            inserts.heading = 'High Score Smashed!';
+            inserts.completionScreenHeaderImg = cloneTemplate('completionScreenHeaderImg-beaten');
+            inserts.subheading = 'You\'re getting faster. That was incredible typing';
+            inserts.buttonText = 'Beat this score';
+
+        } else if (uiState.completionType === 'testComplete'){
+            inserts.heading = 'Test Complete!';
+            inserts.completionScreenHeaderImg = cloneTemplate('completionScreenHeaderImg-baseline-testComplete');
+            inserts.subheading = 'You\'re getting faster. That was incredible typing';
+            inserts.buttonText = 'Go Again';
+        } else {
+            throw new Error('Completion type not supported: ' + uiState.completionType);
+        }
+        ui.querySelector('h1').innerText = inserts.heading;
+        ui.querySelector('.results-page').prepend(inserts.completionScreenHeaderImg );
+        ui.querySelector('.subheading').innerText = inserts.subheading;
+        ui.querySelector('button').prepend(`${inserts.buttonText} `);
+        ui.querySelector('#WPM-results').innerText = uiState.results.wpm;
+        ui.querySelector('#accuracy-results').prepend(`${uiState.results.accuracy}`);
+        ui.querySelector('.typed-correct').innerText = uiState.results.correct;
+        ui.querySelector('.typed-mistake').innerText = uiState.results.mistakes;
+
+    } else{
+        ui = cloneTemplate('testScreen');
+    }
+    const headerTemplate = cloneTemplate('headerTemplate');
+    headerTemplate.querySelector('#personal-best-display').prepend(uiState.personalBest)
+    ui.prepend(headerTemplate)
+    document.body.innerHTML = ``;
+    document.body.appendChild(ui);
+
+    registerDOM();
+}
+
+function cloneTemplate(templateId){
+    console.log('Cloning', templateId);
+    const templateElement = document.getElementById(templateId);
+    return templateElement.content.cloneNode(true);
 }
 function updatePersonalBest(personalBest){
     state.personalBest = personalBest;
+    uiState.personalBest = personalBest;
     localStorage.setItem('personalBest', personalBest);
 }
 
@@ -297,189 +358,12 @@ function setMode(e){
     }
 }
 
-function initializeDOM(){
-    document.body.innerHTML = `<div class="wrapper">
-    <header>
-      <div class="logo-lg">
-        <img src="./assets/images/logo-large.svg" alt="logo">
-      </div>
-      <div class="logo-sm">
-        <img src="./assets/images/logo-small.svg" alt="logo">
-      </div>
-      <div class="personal-best" id="personal-best">
-        <img src="./assets/images/icon-personal-best.svg" alt="trophy">
-        <span >Personal best:</span>
-        <p class="personal-record" id="personal-best-display">92 WPM</p>
-      </div>
-    </header>
-    <main>
-      <section class="stats-difficulty-modes">
-        <div class="stats">
-          <div class="progress-box">
-            <span>WPM:</span>
-            <p id="WPM">0</p>
-          </div>
-          <div class="progress-box">
-            <span>Accuracy:</span>
-            <p id="accuracy">0%</p>
-          </div>
-          <div class="progress-box">
-            <span>Time:</span>
-            <p id="timer">0:00</p>
-          </div>
-        </div>
-        <div class="difficulty-mode">
-          <span>Difficulty: </span>
-          <div class="difficulty">
-            <div class="difficulty-options">
-              <button id="easy-btn" class="difficulty-btn">Easy</button>
-              <button id="medium-btn" class="difficulty-btn">Medium</button>
-              <button id="hard-btn" class="difficulty-btn">Hard</button>
-            </div>
-          </div>
-          <div class="mode">
-            <span>Mode: </span>
-            <div class="mode-options">
-              <button id="timer-btn" class="timer-mode">Timed (60s)</button>
-              <button id="passage-btn" class="timer-mode">Passage</button>
-            </div>
-          </div>
-        </div>
-        <!-- Add Drop Down -->
-        <div class="dropdowns">
-          <div class="dropdown-box">
-            <button class="dropdown-btn" id="difficulty-dropdown">Hard <img src="./assets/images/icon-down-arrow.svg" alt=""></button>
-            <ul id="difficulty-ul">
-              <li id="easy" class="difficulty-btn"><div class="outer-circle"><div class="inner-circle"></div></div>Easy</li>
-              <li id="medium" class="difficulty-btn"><div class="outer-circle"><div class="inner-circle"></div></div>Medium</li>
-              <li id="hard" class="difficulty-btn"><div class="outer-circle"><div class="inner-circle"></div></div>Hard</li>
-            </ul>
-          </div>
-          <div class="dropdown-box">
-            <button class="dropdown-btn" id="mode-dropdown">Timed (60s) <img src="./assets/images/icon-down-arrow.svg" alt="">
-            </button>
-            <ul id="mode-ul">
-              <li id="timed-mode" class="modes timer-mode">
-                <div class="outer-circle">
-                  <div class="inner-circle"></div>
-                </div>Timed
-              </li>
-              <li id="passage-mode" class="modes timer-mode">
-                <div class="outer-circle">
-                  <div class="inner-circle"></div>
-                </div>Passage
-              </li>
-            </ul>
-            </div>
-
-        </div>
-      </section>
-      <section class="passage" >
-        <div class="passage-display-box">
-          <div class="passage-not-started">
-              <button id="start-test">Start Typing Test</button>
-              <p>Or click the text and start typing</p>
-            </div>
-          <div id="passage-display">
-            
-          </div>
-          
-          <button id="restart-test">Restart Test <img src="./assets/images/icon-restart.svg" alt=""></button>
-        </div>
-      </section>
-    </main>
-    <section id="baseline" class="test-page">
-      <div class="star-2">
-        <img class= 'star-2' src="./assets/images/pattern-star-2.svg" alt="">
-      </div>
-      <div class="results-page">
-        <div class="checkmark-wrapper">
-          <div class="outer-bg">
-            <div class="inner-bg">
-              <img src="./assets/images/icon-completed.svg" alt="">
-            </div>
-          </div>
-        </div>
-        <h1>Baseline Established</h1>
-        <span>You've set the bar. Now the real challenge begins-time to beat it</span>
-        <div class="results">
-          <div class="results-box">
-            <span>WPM:</span>
-            <p id="WPM-results" class="WPM-results-baseline">85</p>
-          </div>
-          <div class="results-box">
-            <span>Accuracy:</span>
-            <p id="accuracy-results" class="accuracy-results-baseline">90%</p>
-          </div>
-          <div class="results-box">
-            <span>Characters:</span>
-            <div class="char-typed"><p class="typed-correct baseline-correct">0</p>/<p class="typed-mistake baseline-mistake">0</p></div>
-          </div>
-        </div>
-        <button id="beat-score-btn1" class="results-button">Beat This Score <img src="./assets/images/icon-restart.svg"
-            alt="" class="restart-img"></button>
-      </div>
-      <img  class= 'star-1' src="./assets/images/pattern-star-1.svg" alt="">
-    </section>
-    <section id="new-pb" class="test-page">
-      <div class="results-page">
-        <div class="pb-img">
-          <img src="./assets/images/icon-new-pb.svg" alt="">
-        </div>
-        <h1>High Score Smashed!</h1>
-        <span>You're getting faster. That was incredible typing</span>
-        <div class="results">
-          <div class="results-box">
-            <span>WPM:</span>
-            <p id="WPM-results" class="WPM-results-pb">85</p>
-          </div>
-          <div class="results-box">
-            <span>Accuracy:</span>
-            <p id="accuracy-results" class="accuracy-results-pb">90%</p>
-          </div>
-          <div class="results-box">
-            <span>Characters:</span>
-            <div class="char-typed"><p class="typed-correct pb-correct">0</p>/<p class="typed-mistake pb-mistake">0</p></div>
-          </div>
-        </div>
-        <button id="beat-score-btn2" class="results-button">Beat This Score <img src="./assets/images/icon-restart.svg"
-            alt="" class="restart-img"></button>
-      </div>
-      <div class="confetti"></div>
-    </section>
-    <section id="test-complete" class="test-page">
-      <img class="star-2" src="./assets/images/pattern-star-2.svg" alt="">
-      <div class="results-page">
-        <div class="outer-bg">
-          <div class="inner-bg">
-            <img src="./assets/images/icon-completed.svg" alt="">
-          </div>
-        </div>
-        <h1>Test Complete!</h1>
-        <span>You're getting faster. That was incredible typing</span>
-        <div class="results">
-          <div class="results-box">
-            <span>WPM:</span>
-            <p id="WPM-results" class="WPM-results-complete">85</p>
-          </div>
-          <div class="results-box">
-            <span>Accuracy:</span>
-            <p id="accuracy-results" class="accuracy-results-complete">90%</p>
-          </div>
-          <div class="results-box">
-            <span>Characters:</span>
-            <div class="char-typed"><p class="typed-correct complete-correct">0</p>/<p class="typed-mistake complete-mistake">0</p></div>
-          </div>
-        </div>
-        <button id="go-again-btn" class="results-button">Go Again <img src="./assets/images/icon-restart.svg"
-            alt="" class="restart-img"></button>
-      </div>
-      <img class="star-1" src="./assets/images/pattern-star-1.svg" alt="">
-    </section>
-  </div>`
-}
-
 function registerDOM(){
+    if (uiState.completionScreenDisplayed) {
+        domState = {}
+        document.getElementById('beat-score-btn').addEventListener('click', resetAll)
+        return
+    }
     domState = {
         passageDisplay: document.querySelector('#passage-display'),
         timer: document.querySelector('#timer'),
@@ -537,8 +421,6 @@ function registerDOM(){
         difficulty.addEventListener('click', displayRandomPassage);
     })
     document.body.addEventListener("keyup", typeCharacter)
-    document.getElementById('beat-score-btn1').addEventListener('click', resetAll)
-    document.getElementById('beat-score-btn2').addEventListener('click', resetAll)
-    document.getElementById('go-again-btn').addEventListener('click', resetAll);
+
 
 }

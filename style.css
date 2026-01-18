@@ -27,7 +27,9 @@ body{
 span{
     color: var(--Neutral-500)
 }
-
+/*main{*/
+/*    display: flex;*/
+/*}*/
 .wrapper{
     max-width: 1250px;
     width: 95%;
@@ -301,10 +303,10 @@ main{
 }
 
 #baseline{
- display: none;   
+ display: flex;
 }
 #new-pb{
-    display: none;
+    display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
@@ -326,7 +328,7 @@ main{
 .typed-mistake{
     color: var(--Red-500);
 }
-#test-complete{display: none;}
+#test-complete{display: flex;}
 .dropdowns{
     display: none;
     gap: 1rem;

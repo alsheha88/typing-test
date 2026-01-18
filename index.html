@@ -12,6 +12,145 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@100..800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+
+  <template id="headerTemplate">
+    <header>
+      <div class="logo-lg">
+        <img src="./assets/images/logo-large.svg" alt="logo">
+      </div>
+      <div class="logo-sm">
+        <img src="./assets/images/logo-small.svg" alt="logo">
+      </div>
+      <div class="personal-best" id="personal-best">
+        <img src="./assets/images/icon-personal-best.svg" alt="trophy">
+        <span >Personal best:</span>
+        <p class="personal-record" id="personal-best-display"> WPM</p>
+      </div>
+    </header>
+  </template>
+  <template id="testScreen">
+    <div class="wrapper">
+      <main>
+        <section class="stats-difficulty-modes">
+          <div class="stats">
+            <div class="progress-box">
+              <span>WPM:</span>
+              <p id="WPM">0</p>
+            </div>
+            <div class="progress-box">
+              <span>Accuracy:</span>
+              <p id="accuracy">0%</p>
+            </div>
+            <div class="progress-box">
+              <span>Time:</span>
+              <p id="timer">0:00</p>
+            </div>
+          </div>
+          <div class="difficulty-mode">
+            <span>Difficulty: </span>
+            <div class="difficulty">
+              <div class="difficulty-options">
+                <button id="easy-btn" class="difficulty-btn">Easy</button>
+                <button id="medium-btn" class="difficulty-btn">Medium</button>
+                <button id="hard-btn" class="difficulty-btn">Hard</button>
+              </div>
+            </div>
+            <div class="mode">
+              <span>Mode: </span>
+              <div class="mode-options">
+                <button id="timer-btn" class="timer-mode">Timed (60s)</button>
+                <button id="passage-btn" class="timer-mode">Passage</button>
+              </div>
+            </div>
+          </div>
+          <!-- Add Drop Down -->
+          <div class="dropdowns">
+            <div class="dropdown-box">
+              <button class="dropdown-btn" id="difficulty-dropdown">Hard <img src="./assets/images/icon-down-arrow.svg" alt=""></button>
+              <ul id="difficulty-ul">
+                <li id="easy" class="difficulty-btn"><div class="outer-circle"><div class="inner-circle"></div></div>Easy</li>
+                <li id="medium" class="difficulty-btn"><div class="outer-circle"><div class="inner-circle"></div></div>Medium</li>
+                <li id="hard" class="difficulty-btn"><div class="outer-circle"><div class="inner-circle"></div></div>Hard</li>
+              </ul>
+            </div>
+            <div class="dropdown-box">
+              <button class="dropdown-btn" id="mode-dropdown">Timed (60s) <img src="./assets/images/icon-down-arrow.svg" alt="">
+              </button>
+              <ul id="mode-ul">
+                <li id="timed-mode" class="modes timer-mode">
+                  <div class="outer-circle">
+                    <div class="inner-circle"></div>
+                  </div>Timed
+                </li>
+                <li id="passage-mode" class="modes timer-mode">
+                  <div class="outer-circle">
+                    <div class="inner-circle"></div>
+                  </div>Passage
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+        <section class="passage" >
+          <div class="passage-display-box">
+            <div class="passage-not-started">
+              <button id="start-test">Start Typing Test</button>
+              <p>Or click the text and start typing</p>
+            </div>
+            <div id="passage-display">
+
+            </div>
+
+            <button id="restart-test">Restart Test <img src="./assets/images/icon-restart.svg" alt=""></button>
+          </div>
+        </section>
+      </main>
+    </div>
+  </template>
+  <template id="completionScreen">
+    <section class="completion-screen">
+      <div class="star-2">
+        <img class= 'star-2' src="./assets/images/pattern-star-2.svg" alt="">
+      </div>
+      <div class="results-page">
+        <h1></h1>
+        <span class="subheading"></span>
+        <div class="results">
+          <div class="results-box">
+            <span>WPM:</span>
+            <p id="WPM-results" class="WPM-results-baseline"></p>
+          </div>
+          <div class="results-box">
+            <span>Accuracy:</span>
+            <p id="accuracy-results" class="accuracy-results-baseline">%</p>
+          </div>
+          <div class="results-box">
+            <span>Characters:</span>
+            <div class="char-typed"><p class="typed-correct baseline-correct"></p>/<p class="typed-mistake baseline-mistake"></p></div>
+          </div>
+        </div>
+        <button id="beat-score-btn" class="results-button"><img src="./assets/images/icon-restart.svg"
+                                                                alt="" class="restart-img"></button>
+      </div>
+      <img  class= 'star-1' src="./assets/images/pattern-star-1.svg" alt="">
+    </section>
+  </template>
+
+  <template id="completionScreenHeaderImg-beaten">
+    <div class="pb-img">
+      <img src="./assets/images/icon-new-pb.svg" alt="">
+    </div>
+  </template>
+
+  <template id="completionScreenHeaderImg-baseline-testComplete">
+    <div class="checkmark-wrapper">
+      <div class="outer-bg">
+        <div class="inner-bg">
+          <img src="./assets/images/icon-completed.svg" alt="">
+        </div>
+      </div>
+    </div>
+  </template>
 </head>
 
 <body>
