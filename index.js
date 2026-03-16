@@ -96,7 +96,7 @@ function displayRandomPassage(e){
     const clickedBtn = e.target;
     document.querySelector('.passage-not-started').style.display = 'flex';
     document.querySelectorAll('.difficulty-btn').forEach((btn) => {
-        if (btn == clickedBtn) {
+        if (btn === clickedBtn) {
             btn.classList.add('active')
         } else {
             btn.classList.remove('active')
@@ -346,12 +346,12 @@ function startTest(){
 
 function setMode(e){
     const clickedMode = e.target;
-    document.querySelectorAll('.timer-mode').forEach((btn) => {if (btn == clickedMode)  {btn.classList.add('active')} else {btn.classList.remove('active')}})
-    if (clickedMode.id == 'timer-btn' || clickedMode.id == 'timed-mode'){
+    document.querySelectorAll('.timer-mode').forEach((btn) => {if (btn === clickedMode)  {btn.classList.add('active')} else {btn.classList.remove('active')}})
+    if (clickedMode.id === 'timer-btn' || clickedMode.id === 'timed-mode'){
         state.mode = 'timer'
         document.querySelector('#passage-btn').disabled = true;
         domState.modeDropdown.classList.remove('show')
-    } else if (clickedMode.id == 'passage-btn' || clickedMode.id == 'passage-mode'){
+    } else if (clickedMode.id === 'passage-btn' || clickedMode.id === 'passage-mode'){
         state.mode = 'passage'
         document.querySelector('#timer-btn').disabled = true;
         domState.modeDropdown.classList.remove('show');
@@ -420,7 +420,5 @@ function registerDOM(){
     document.querySelectorAll('.difficulty-btn').forEach((difficulty) => {
         difficulty.addEventListener('click', displayRandomPassage);
     })
-    document.body.addEventListener("keyup", typeCharacter)
-
-
+    document.body.addEventListener("keyup", typeCharacter);
 }
